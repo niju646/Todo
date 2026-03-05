@@ -40,8 +40,6 @@ class TodoNotifier extends StateNotifier<TodoState> {
   }
 
   /// FETCH TODOS
-  /// [loadMore] = true → fetches the next page and appends to the list
-  /// [loadMore] = false → resets to page 1 (fresh fetch)
   Future<void> fetchTodos({bool loadMore = false}) async {
     if (state.isLoading) return;
     if (loadMore && !state.hasMore) return; // nothing more to load
