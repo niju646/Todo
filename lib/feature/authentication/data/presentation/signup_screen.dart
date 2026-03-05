@@ -203,7 +203,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           final updatedState = ref.read(userProvider);
                           if (!context.mounted) return;
                           if (updatedState.error == null) {
-                            context.goNamed(RouteConstants.bottomNav);
+                            context.goNamed(RouteConstants.login);
 
                             CustomSnackbar.show(
                               context,

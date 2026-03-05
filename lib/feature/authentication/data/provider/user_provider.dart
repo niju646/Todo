@@ -47,7 +47,8 @@ class UserNotifier extends StateNotifier<UserState> {
       log(response.data.toString());
       log(response.statusCode.toString());
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final userJson = response.data['user'];
+        // final userJson = response.data['user'];
+        final userJson = Map<String, dynamic>.from(response.data['user']);
 
         userJson.remove("password");
 
@@ -89,7 +90,8 @@ class UserNotifier extends StateNotifier<UserState> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         log("signup successfull");
-        state = state.copyWith(isLoading: false);
+        // state = state.copyWith(isLoading: false);
+        state = UserState();
       } else {
         state = state.copyWith(
           isLoading: false,
@@ -122,8 +124,9 @@ class UserNotifier extends StateNotifier<UserState> {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         await ThemeStorageService.instance.clearTokens();
+
         // await ThemeStorageService.instance.clearUserData();
-        state = state.copyWith(isLoading: false);
+        state = UserState();
         log("logout successfull");
       } else {
         state = state.copyWith(
