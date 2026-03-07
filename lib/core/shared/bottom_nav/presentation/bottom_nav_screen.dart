@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:to_do/core/shared/bottom_nav/controller/bottom_navbar_controller.dart';
 import 'package:to_do/core/utils/responsive.dart';
+import 'package:to_do/feature/analytics/data/presentation/analytics_screen.dart';
 import 'package:to_do/feature/todo/data/presentation/home_screen.dart';
 import 'package:to_do/feature/todo/data/presentation/profile_screen.dart';
 
@@ -11,6 +12,7 @@ class BottomNavScreen extends ConsumerWidget {
   List<Widget> _getPages() {
     return const [
       HomeScreen(),
+      AnalyticsScreen(),
       ProfileScreen(),
       // Center(child: Text("Classes")),
       // Center(child: Text("Profile")),
@@ -23,6 +25,11 @@ class BottomNavScreen extends ConsumerWidget {
         icon: Icon(Icons.home, size: 24),
         activeIcon: Icon(Icons.home, size: 26),
         label: 'Home',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.analytics, size: 24),
+        activeIcon: Icon(Icons.analytics, size: 26),
+        label: 'Analytics',
       ),
 
       BottomNavigationBarItem(

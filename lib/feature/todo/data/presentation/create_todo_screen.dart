@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:to_do/core/shared/common_app_bar.dart';
 import 'package:to_do/core/shared/common_text_field.dart';
 import 'package:to_do/core/shared/custom_snackbar.dart';
+import 'package:to_do/core/utils/custom_datepicker.dart';
 import 'package:to_do/feature/todo/data/provider/todo_provider.dart';
 
 class CreateTodoScreen extends ConsumerStatefulWidget {
@@ -16,6 +18,7 @@ class CreateTodoScreen extends ConsumerStatefulWidget {
 class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -126,6 +129,23 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
                               }
                               return null;
                             },
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: CustomDatePicker(
+                              label: "Deadline*",
+                              dateController: _dateController,
+                              onDateSelected: (selectedDate) {
+                                _dateController.text = DateFormat(
+                                  'dd/MM/yyyy',
+                                ).format(selectedDate);
+                              },
+                              firstDate: DateTime(2025),
+                              lastDate: DateTime(2100),
+                              initialDate: DateTime.now(),
+                            ),
                           ),
                           const SizedBox(height: 20),
                           _FieldLabel(

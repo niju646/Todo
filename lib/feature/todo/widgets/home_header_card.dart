@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/core/utils/helper/helper.dart';
 
 class HomeHeaderCard extends StatelessWidget {
   final TextEditingController searchController;
@@ -13,13 +14,6 @@ class HomeHeaderCard extends StatelessWidget {
     required this.onSearchChanged,
     required this.onSearchCleared,
   });
-
-  String get _greeting {
-    final h = DateTime.now().hour;
-    if (h < 12) return "Good morning";
-    if (h < 17) return "Good afternoon";
-    return "Good evening";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +49,7 @@ class HomeHeaderCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _greeting,
+                  Helper().greeting,
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.white.withAlpha(160),

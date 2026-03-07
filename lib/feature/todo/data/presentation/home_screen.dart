@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:to_do/core/interceptor/network_provider.dart';
 import 'package:to_do/core/routes/router_constants.dart';
+import 'package:to_do/core/shared/common_shimmer_list.dart';
+import 'package:to_do/core/shared/common_shimmer_tile.dart';
 import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/shared/widgets/common_card.dart';
 import 'package:to_do/core/shared/widgets/empty_screen.dart';
@@ -49,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(todoProvider);
+    final networkState = ref.watch(networkProvider);
 
     final filteredTodos = _searchQuery.isEmpty
         ? state.todos
@@ -79,16 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
 
           if (state.isLoading && state.todos.isEmpty)
-            const Expanded(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF1A1A2E),
-                  strokeWidth: 2.5,
-                ),
-              ),
-            )
-          else if (state.error != null)
-            Expanded(child: Center(child: Text(state.error!)))
+            Expanded(child: Center(child: commonShimmerList(itemCount: 10)))
           else if (filteredTodos.isEmpty)
             Expanded(
               child: Center(
@@ -112,74 +107,85 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             )
           else
             Expanded(
-              child: RefreshIndicator(
-                onRefresh: refreshAllData,
-                color: const Color(0xFF1A1A2E),
-                child: ListView.builder(
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                  itemCount: filteredTodos.length + 1,
-                  itemBuilder: (context, index) {
-                    // Footer
-                    if (index == filteredTodos.length) {
-                      if (state.isLoading) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: Color(0xFF1A1A2E),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                      if (!state.hasMore) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Center(
-                            child: Text(
-                              "All ${state.totalItems} tasks loaded",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade400,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    }
+              child:
+                  /// OFFLINE BANNER
+                  networkState.when(
+                    data: (isConnected) {
+                      if (isConnected) {
+                        return RefreshIndicator(
+                          onRefresh: refreshAllData,
+                          color: const Color(0xFF1A1A2E),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                            itemCount: filteredTodos.length + 1,
+                            itemBuilder: (context, index) {
+                              // Footer
+                              if (index == filteredTodos.length) {
+                                if (state.isLoading) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: CommonShimmerTile(),
+                                  );
+                                }
+                                if (!state.hasMore) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "All ${state.totalItems} tasks loaded",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade400,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }
 
-                    final todo = filteredTodos[index];
-                    return CommonCard(
-                      onTap: () {
-                        context.pushNamed(
-                          RouteConstants.todoDetailScreen,
-                          extra: todo.id,
+                              final todo = filteredTodos[index];
+                              return CommonCard(
+                                onTap: () {
+                                  context.pushNamed(
+                                    RouteConstants.todoDetailScreen,
+                                    extra: todo.id,
+                                  );
+                                },
+                                title: todo.title ?? "",
+                                description: todo.description ?? "",
+                                icon: Icons.delete_outline_rounded,
+                                onDelete: () {
+                                  ref
+                                      .read(todoProvider.notifier)
+                                      .deleteTodo(id: todo.id ?? 0);
+                                  CustomSnackbar.show(
+                                    context,
+                                    message: "Todo deleted successfully!",
+                                    type: SnackbarType.success,
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         );
-                      },
-                      title: todo.title ?? "",
-                      description: todo.description ?? "",
-                      icon: Icons.delete_outline_rounded,
-                      onDelete: () {
-                        ref
-                            .read(todoProvider.notifier)
-                            .deleteTodo(id: todo.id ?? 0);
-                        CustomSnackbar.show(
-                          context,
-                          message: "Todo deleted successfully!",
-                          type: SnackbarType.success,
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
+                      }
+                      return Center(
+                        child: EmptyStateCard(
+                          title: "No Network",
+                          subtitle:
+                              "Make sure that you are connected to internet",
+                          icon: Icons.wifi_off_rounded,
+                        ),
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, _) => const SizedBox.shrink(),
+                  ),
             ),
         ],
       ),
