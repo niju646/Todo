@@ -131,6 +131,11 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
                             },
                           ),
                           const SizedBox(height: 20),
+                          _FieldLabel(
+                            label: "Deadline",
+                            icon: Icons.calendar_month_outlined,
+                          ),
+                          const SizedBox(height: 8),
                           SizedBox(
                             width: double.infinity,
                             height: 50,

@@ -14,8 +14,6 @@ class AnalyticsScreen extends ConsumerStatefulWidget {
 class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _fadeAnim;
-  late Animation<Offset> _slideAnim;
 
   @override
   void initState() {
@@ -24,11 +22,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
     _controller.forward();
   }
 
@@ -83,228 +77,206 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen>
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: FadeTransition(
-        opacity: _fadeAnim,
-        child: SlideTransition(
-          position: _slideAnim,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _AnalyticsHeader(
-                  completionRate: completionRate,
-                  completed: completed,
-                  total: total,
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _AnalyticsHeader(
+              completionRate: completionRate,
+              completed: completed,
+              total: total,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SummaryCard(
-                              label: "Total",
-                              value: "$total",
-                              icon: Icons.list_alt_rounded,
-                              color: const Color.fromARGB(255, 35, 35, 153),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: SummaryCard(
-                              label: "Completed",
-                              value: "$completed",
-                              icon: Icons.check_circle_outline_rounded,
-                              color: const Color(0xFF43A047),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: SummaryCard(
-                              label: "Pending",
-                              value: "$pending",
-                              icon: Icons.radio_button_unchecked_rounded,
-                              color: const Color(0xFFFFB300),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SummaryCard(
-                              label: "Best Streak",
-                              value: "$maxStreak",
-                              icon: Icons.local_fire_department_rounded,
-                              color: const Color(0xFFE53935),
-                              suffix: "tasks",
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            flex: 2,
-                            child: SummaryCard(
-                              label: "Completion Rate",
-                              value:
-                                  "${(completionRate * 100).toStringAsFixed(1)}%",
-                              icon: Icons.insights_rounded,
-                              color: const Color(0xFF5C6BC0),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      const _SectionTitle(title: "This Week"),
-                      SizedBox(height: 10),
-
-                      _SectionCard(
-                        child: Column(
-                          children: [
-                            // Bar chart
-                            SizedBox(
-                              height: 140,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: weekDays.map((day) {
-                                  return Expanded(
-                                    child: _WeekBar(
-                                      data: day,
-                                      maxValue: maxBarValue == 0
-                                          ? 1
-                                          : maxBarValue,
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Divider(
-                              color: Colors.grey.withAlpha(30),
-                              height: 1,
-                            ),
-                            const SizedBox(height: 14),
-                            // Legend
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _Legend(
-                                  color: const Color(0xFF1A1A2E),
-                                  label: "Created",
-                                ),
-                                const SizedBox(width: 20),
-                                _Legend(
-                                  color: const Color(0xFF69F0AE),
-                                  label: "Completed",
-                                ),
-                              ],
-                            ),
-                          ],
+                      Expanded(
+                        child: SummaryCard(
+                          label: "Total",
+                          value: "$total",
+                          icon: Icons.list_alt_rounded,
+                          color: Color(0xFF5C6BC0),
                         ),
                       ),
-
-                      const SizedBox(height: 28),
-
-                      const _SectionTitle(title: "Overview"),
-                      SizedBox(height: 10),
-                      _SectionCard(
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 110,
-                              height: 110,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  TweenAnimationBuilder<double>(
-                                    tween: Tween(
-                                      begin: 0.0,
-                                      end: completionRate,
-                                    ),
-                                    duration: const Duration(
-                                      milliseconds: 1000,
-                                    ),
-                                    curve: Curves.easeOut,
-                                    builder: (context, val, _) => CustomPaint(
-                                      size: const Size(110, 110),
-                                      painter: _DonutPainter(progress: val),
-                                    ),
-                                  ),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        "${(completionRate * 100).toStringAsFixed(0)}%",
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w800,
-                                          color: Color(0xFF1A1A2E),
-                                        ),
-                                      ),
-                                      Text(
-                                        "done",
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(width: 24),
-
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  _BreakdownRow(
-                                    label: "Completed",
-                                    value: completed,
-                                    total: total,
-                                    color: const Color(0xFF43A047),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  _BreakdownRow(
-                                    label: "Pending",
-                                    value: pending,
-                                    total: total,
-                                    color: const Color(0xFFFFB300),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  _BreakdownRow(
-                                    label: "Total",
-                                    value: total,
-                                    total: total,
-                                    color: const Color(0xFF1A1A2E),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SummaryCard(
+                          label: "Completed",
+                          value: "$completed",
+                          icon: Icons.check_circle_outline_rounded,
+                          color: const Color(0xFF43A047),
                         ),
                       ),
-
-                      const SizedBox(height: 28),
-
-                      // ── Motivational footer ────────────────
-                      _MotivationCard(
-                        completionRate: completionRate,
-                        total: total,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SummaryCard(
+                          label: "Pending",
+                          value: "$pending",
+                          icon: Icons.radio_button_unchecked_rounded,
+                          color: const Color(0xFFFFB300),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 12),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SummaryCard(
+                          label: "Best Streak",
+                          value: "$maxStreak",
+                          icon: Icons.local_fire_department_rounded,
+                          color: const Color(0xFFE53935),
+                          suffix: "tasks",
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 2,
+                        child: SummaryCard(
+                          label: "Completion Rate",
+                          value:
+                              "${(completionRate * 100).toStringAsFixed(1)}%",
+                          icon: Icons.insights_rounded,
+                          color: const Color(0xFF5C6BC0),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  const _SectionTitle(title: "This Week"),
+                  SizedBox(height: 10),
+
+                  _SectionCard(
+                    child: Column(
+                      children: [
+                        // Bar chart
+                        SizedBox(
+                          height: 140,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: weekDays.map((day) {
+                              return Expanded(
+                                child: _WeekBar(
+                                  data: day,
+                                  maxValue: maxBarValue == 0 ? 1 : maxBarValue,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Divider(color: Colors.grey.withAlpha(30), height: 1),
+                        const SizedBox(height: 14),
+                        // Legend
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _Legend(color: Color(0xFF5C6BC0), label: "Created"),
+                            const SizedBox(width: 20),
+                            _Legend(
+                              color: const Color(0xFF69F0AE),
+                              label: "Completed",
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  const _SectionTitle(title: "Overview"),
+                  SizedBox(height: 10),
+                  _SectionCard(
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 110,
+                          height: 110,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0.0, end: completionRate),
+                                duration: const Duration(milliseconds: 1000),
+                                curve: Curves.easeOut,
+                                builder: (context, val, _) => CustomPaint(
+                                  size: const Size(110, 110),
+                                  painter: _DonutPainter(progress: val),
+                                ),
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "${(completionRate * 100).toStringAsFixed(0)}%",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF5C6BC0),
+                                    ),
+                                  ),
+                                  Text(
+                                    "done",
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 24),
+
+                        Expanded(
+                          child: Column(
+                            children: [
+                              _BreakdownRow(
+                                label: "Completed",
+                                value: completed,
+                                total: total,
+                                color: const Color(0xFF43A047),
+                              ),
+                              const SizedBox(height: 12),
+                              _BreakdownRow(
+                                label: "Pending",
+                                value: pending,
+                                total: total,
+                                color: const Color(0xFFFFB300),
+                              ),
+                              const SizedBox(height: 12),
+                              _BreakdownRow(
+                                label: "Total",
+                                value: total,
+                                total: total,
+                                color: const Color(0xFF5C6BC0),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // ── Motivational footer ────────────────
+                  _MotivationCard(completionRate: completionRate, total: total),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -490,7 +462,7 @@ class _WeekBar extends StatelessWidget {
                     height: 90 * val,
                     decoration: BoxDecoration(
                       color: data.isToday
-                          ? const Color(0xFF1A1A2E).withAlpha(30)
+                          ? const Color.fromARGB(255, 88, 88, 192).withAlpha(30)
                           : Colors.grey.withAlpha(25),
                       borderRadius: BorderRadius.circular(6),
                     ),

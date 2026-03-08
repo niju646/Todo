@@ -22,6 +22,7 @@ A Flutter Todo app demonstrating:
 - Dark mode toggle
 - Notifications toggle
 - Safe retry mechanism for expired tokens
+- Analytics screen 
 
 ---
 
@@ -38,4 +39,5 @@ A Flutter Todo app demonstrating:
 ## Installation
 
 1. Clone the repository for the application
-2. Run the application
+2. Run Flutter pub get
+3. Run the application

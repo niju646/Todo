@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/utils/format_date.dart';
 import 'package:to_do/feature/todo/data/provider/todo_provider.dart';
+import 'package:to_do/feature/todo/widgets/bottom_sheet.dart';
 
 class TodoDetailScreen extends ConsumerStatefulWidget {
   final int id;
@@ -82,12 +84,40 @@ class _TodoDetailScreenState extends ConsumerState<TodoDetailScreen>
                           },
                         ),
                         const Spacer(),
-                        _CircleIconButton(
-                          icon: Icons.delete_outline_rounded,
-                          onTap: () {},
-                          color: const Color(0xFFFFEDED),
-                          iconColor: const Color(0xFFE53935),
-                        ),
+                        (!isCompleted)
+                            ? _CircleIconButton(
+                                icon: Icons.edit,
+                                onTap: () {
+                                  showEditTodoSheet(
+                                    context: context,
+                                    title: todo.title ?? "",
+                                    description: todo.description ?? "",
+                                    onPressed:
+                                        (
+                                          updatedTitle,
+                                          updatedDescription,
+                                        ) async {
+                                          await ref
+                                              .read(todoProvider.notifier)
+                                              .updateTodo(
+                                                id: todo.id!,
+                                                title: updatedTitle,
+                                                description: updatedDescription,
+                                              );
+                                          if (!context.mounted) return;
+                                          CustomSnackbar.show(
+                                            context,
+                                            message: "Updated successfully",
+                                            type: SnackbarType.success,
+                                          );
+                                          context.pop();
+                                        },
+                                  );
+                                },
+                                color: const Color(0xFFFFEDED),
+                                iconColor: const Color(0xFFE53935),
+                              )
+                            : SizedBox.shrink(),
                       ],
                     ),
                   ),
@@ -148,6 +178,23 @@ class _TodoDetailScreenState extends ConsumerState<TodoDetailScreen>
                                 label: formatTime(DateTime.now()),
                               ),
                             ],
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            "Deadline",
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge?.color,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          SizedBox(
+                            width: 150,
+                            child: _MetaChip(
+                              icon: Icons.calendar_month_rounded,
+                              label: 'deadline',
+                            ),
                           ),
 
                           const SizedBox(height: 24),

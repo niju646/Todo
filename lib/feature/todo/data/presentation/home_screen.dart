@@ -83,7 +83,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
 
           if (state.isLoading && state.todos.isEmpty)
-            Expanded(child: Center(child: commonShimmerList(itemCount: 10)))
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Center(child: commonShimmerList(itemCount: 10)),
+              ),
+            )
           else if (filteredTodos.isEmpty)
             Expanded(
               child: Center(
