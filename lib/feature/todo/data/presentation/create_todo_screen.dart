@@ -42,6 +42,7 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
         .createTodo(
           title: _titleController.text.trim(),
           description: _descriptionController.text.trim(),
+          deadline: _dateController.text.trim(),
         );
 
     if (!mounted) return;

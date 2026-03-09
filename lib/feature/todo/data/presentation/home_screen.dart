@@ -51,8 +51,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(networkProvider, (previous, next) {
+      if (previous == null) return;
+
+      next.whenData((isConnected) {
+        if (!isConnected) {
+          CustomSnackbar.show(
+            context,
+            message: "No Internet Connection",
+            type: SnackbarType.failure,
+          );
+        } else {
+          CustomSnackbar.show(
+            context,
+            message: "Back Online",
+            type: SnackbarType.success,
+          );
+        }
+      });
+    });
     final state = ref.watch(todoProvider);
-    final networkState = ref.watch(networkProvider);
 
     final filteredTodos = _searchQuery.isEmpty
         ? state.todos
@@ -112,85 +130,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             )
           else
             Expanded(
-              child:
-                  /// OFFLINE BANNER
-                  networkState.when(
-                    data: (isConnected) {
-                      if (isConnected) {
-                        return RefreshIndicator(
-                          onRefresh: refreshAllData,
-                          color: const Color(0xFF1A1A2E),
-                          child: ListView.builder(
-                            controller: _scrollController,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                            itemCount: filteredTodos.length + 1,
-                            itemBuilder: (context, index) {
-                              // Footer
-                              if (index == filteredTodos.length) {
-                                if (state.isLoading) {
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 16),
-                                    child: CommonShimmerTile(),
-                                  );
-                                }
-                                if (!state.hasMore) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "All ${state.totalItems} tasks loaded",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade400,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              }
-
-                              final todo = filteredTodos[index];
-                              return CommonCard(
-                                onTap: () {
-                                  context.pushNamed(
-                                    RouteConstants.todoDetailScreen,
-                                    extra: todo.id,
-                                  );
-                                },
-                                title: todo.title ?? "",
-                                description: todo.description ?? "",
-                                icon: Icons.delete_outline_rounded,
-                                onDelete: () {
-                                  ref
-                                      .read(todoProvider.notifier)
-                                      .deleteTodo(id: todo.id ?? 0);
-                                  CustomSnackbar.show(
-                                    context,
-                                    message: "Todo deleted successfully!",
-                                    type: SnackbarType.success,
-                                  );
-                                },
-                              );
-                            },
+              child: RefreshIndicator(
+                onRefresh: refreshAllData,
+                color: const Color(0xFF1A1A2E),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                  itemCount: filteredTodos.length + 1,
+                  itemBuilder: (context, index) {
+                    // Footer
+                    if (index == filteredTodos.length) {
+                      if (state.isLoading) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: CommonShimmerTile(),
+                        );
+                      }
+                      if (!state.hasMore) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Center(
+                            child: Text(
+                              "All ${state.totalItems} tasks loaded",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
                           ),
                         );
                       }
-                      return Center(
-                        child: EmptyStateCard(
-                          title: "No Network",
-                          subtitle:
-                              "Make sure that you are connected to internet",
-                          icon: Icons.wifi_off_rounded,
-                        ),
-                      );
-                    },
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, _) => const SizedBox.shrink(),
-                  ),
+                      return const SizedBox.shrink();
+                    }
+
+                    final todo = filteredTodos[index];
+                    return CommonCard(
+                      onTap: () {
+                        context.pushNamed(
+                          RouteConstants.todoDetailScreen,
+                          extra: todo.id,
+                        );
+                      },
+                      title: todo.title ?? "",
+                      description: todo.description ?? "",
+                      icon: Icons.delete_outline_rounded,
+                      onDelete: () {
+                        ref
+                            .read(todoProvider.notifier)
+                            .deleteTodo(id: todo.id ?? 0);
+                        CustomSnackbar.show(
+                          context,
+                          message: "Todo deleted successfully!",
+                          type: SnackbarType.success,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
             ),
         ],
       ),

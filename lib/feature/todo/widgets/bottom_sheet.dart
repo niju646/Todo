@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:to_do/core/utils/custom_datepicker.dart';
 
 class EditBottomSheet extends StatefulWidget {
   final String title;
   final String description;
-  final Future<void> Function(String title, String description) onPressed;
+  final String deadline;
+  final Future<void> Function(String title, String description, String deadline)
+  onPressed;
   const EditBottomSheet({
     super.key,
     required this.onPressed,
     required this.title,
     required this.description,
+    required this.deadline,
   });
 
   @override
@@ -18,6 +23,7 @@ class EditBottomSheet extends StatefulWidget {
 class _EditBottomSheetState extends State<EditBottomSheet> {
   late final TextEditingController titleController;
   late final TextEditingController descController;
+  late final TextEditingController dateController;
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
@@ -26,12 +32,14 @@ class _EditBottomSheetState extends State<EditBottomSheet> {
     super.initState();
     titleController = TextEditingController(text: widget.title);
     descController = TextEditingController(text: widget.description);
+    dateController = TextEditingController(text: widget.deadline);
   }
 
   @override
   void dispose() {
     titleController.dispose();
     descController.dispose();
+    dateController.dispose();
     super.dispose();
   }
 
@@ -89,6 +97,23 @@ class _EditBottomSheetState extends State<EditBottomSheet> {
               ),
 
               const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: CustomDatePicker(
+                  label: "Deadline*",
+                  dateController: dateController,
+                  onDateSelected: (selectedDate) {
+                    dateController.text = DateFormat(
+                      'dd/MM/yyyy',
+                    ).format(selectedDate);
+                  },
+                  firstDate: DateTime(2025),
+                  lastDate: DateTime(2100),
+                  initialDate: DateTime.now(),
+                ),
+              ),
+              const SizedBox(height: 16),
 
               /// Description
               TextFormField(
@@ -120,6 +145,7 @@ class _EditBottomSheetState extends State<EditBottomSheet> {
                           await widget.onPressed(
                             titleController.text.trim(),
                             descController.text.trim(),
+                            dateController.text.trim(),
                           );
 
                           if (mounted) setState(() => isLoading = false);
@@ -171,7 +197,13 @@ void showEditTodoSheet({
   required BuildContext context,
   required String title,
   required String description,
-  required Future<void> Function(String title, String description) onPressed,
+  String? deadline,
+  required Future<void> Function(
+    String title,
+    String description,
+    String deadline,
+  )
+  onPressed,
 }) {
   showModalBottomSheet(
     context: context,
@@ -180,6 +212,7 @@ void showEditTodoSheet({
     builder: (_) => EditBottomSheet(
       title: title,
       description: description,
+      deadline: deadline ?? "",
       onPressed: onPressed,
     ),
   );

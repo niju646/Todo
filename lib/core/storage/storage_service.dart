@@ -11,6 +11,9 @@ class ThemeStorageService {
   static const _userDataKey = 'user_data';
   static const _refreshTokenKey = 'refresh_token';
 
+  //offline todo
+  static const _todoCacheKey = 'cached_todos';
+
   Box get _box => Hive.box(_boxName);
 
   /// Save theme
@@ -23,22 +26,22 @@ class ThemeStorageService {
     return _box.get(_themeKey);
   }
 
-  /// ✅ Save auth token
+  ///  Save auth token
   Future<void> saveToken(String token) async {
     await _box.put(_accessTokenKey, token);
   }
 
-  /// ✅ Get auth token
+  /// Get auth token
   String? getAccessToken() {
     return _box.get(_accessTokenKey);
   }
 
-  /// ✅ Save user data
+  /// Save user data
   Future<void> saveUserData(String userData) async {
     await _box.put(_userDataKey, userData);
   }
 
-  /// ✅ Get user data
+  /// Get user data
   String? getUserData() {
     return _box.get(_userDataKey);
   }
@@ -55,5 +58,22 @@ class ThemeStorageService {
     await _box.delete(_accessTokenKey);
     await _box.delete(_refreshTokenKey);
     await _box.delete(_userDataKey);
+  }
+
+  /// OFFLINE todo
+
+  /// Save todos
+  Future<void> saveTodos(String todosJson) async {
+    await _box.put(_todoCacheKey, todosJson);
+  }
+
+  /// Get cached todos
+  String? getTodos() {
+    return _box.get(_todoCacheKey);
+  }
+
+  /// Clear todos
+  Future<void> clearTodos() async {
+    await _box.delete(_todoCacheKey);
   }
 }

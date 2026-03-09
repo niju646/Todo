@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/utils/format_date.dart';
+import 'package:to_do/core/utils/helper/helper.dart';
 import 'package:to_do/feature/todo/data/provider/todo_provider.dart';
 import 'package:to_do/feature/todo/widgets/bottom_sheet.dart';
 
@@ -92,16 +93,19 @@ class _TodoDetailScreenState extends ConsumerState<TodoDetailScreen>
                                     context: context,
                                     title: todo.title ?? "",
                                     description: todo.description ?? "",
+                                    deadline: todo.deadline ?? "",
                                     onPressed:
                                         (
                                           updatedTitle,
                                           updatedDescription,
+                                          updatedDeadline,
                                         ) async {
                                           await ref
                                               .read(todoProvider.notifier)
                                               .updateTodo(
                                                 id: todo.id!,
                                                 title: updatedTitle,
+                                                deadline: updatedDeadline,
                                                 description: updatedDescription,
                                               );
                                           if (!context.mounted) return;
@@ -190,10 +194,12 @@ class _TodoDetailScreenState extends ConsumerState<TodoDetailScreen>
                           ),
                           SizedBox(height: 10),
                           SizedBox(
-                            width: 150,
+                            width: 230,
                             child: _MetaChip(
                               icon: Icons.calendar_month_rounded,
-                              label: 'deadline',
+                              label: Helper().formatDate(
+                                todo.deadline ?? "Deadline",
+                              ),
                             ),
                           ),
 

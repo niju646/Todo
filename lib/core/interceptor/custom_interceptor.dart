@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:to_do/core/api_end_points.dart';
 import 'package:to_do/core/storage/storage_service.dart';
 import 'package:to_do/core/utils/urls/base_urls.dart';
 
@@ -33,13 +34,17 @@ class CustomInterceptor extends Interceptor {
         }
 
         final response = await dio.post(
-          '${BaseUrls.todos}/auth/refresh',
+          '${BaseUrls.todos}${ApiEndpoints.refreshToken}',
           data: {"token": refreshToken},
         );
 
         final newAccessToken = response.data['accessToken'];
+        final newRefreshToken = response.data['refreshToken'];
 
         await ThemeStorageService.instance.saveToken(newAccessToken);
+        if (newRefreshToken != null) {
+          await ThemeStorageService.instance.saveRefreshToken(newRefreshToken);
+        }
 
         _isRefreshing = false;
 

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:to_do/core/api_end_points.dart';
 import 'package:to_do/core/services/api_services.dart';
+import 'package:to_do/core/storage/storage_service.dart';
 import 'package:to_do/feature/todo/data/service/todo_service.dart';
 import 'package:to_do/feature/todo/model/todo_model.dart';
 
@@ -15,6 +18,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
   Future<void> createTodo({
     required String title,
     required String description,
+    required String deadline,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -22,6 +26,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
       final response = await ApiServices.post(ApiEndpoints.getTodo, {
         "title": title,
         "description": description,
+        "deadline": deadline,
       });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -61,6 +66,13 @@ class TodoNotifier extends StateNotifier<TodoState> {
         final List<Data> fetchedTodos = (json["data"] as List)
             .map((e) => Data.fromJson(e))
             .toList();
+        //load todo in offline
+        final updatedTodos = loadMore
+            ? [...state.todos, ...fetchedTodos]
+            : fetchedTodos;
+        await ThemeStorageService.instance.saveTodos(
+          jsonEncode(updatedTodos.map((e) => e.toJson()).toList()),
+        );
 
         state = state.copyWith(
           isLoading: false,
@@ -70,13 +82,41 @@ class TodoNotifier extends StateNotifier<TodoState> {
           currentPage: json["currentPage"],
         );
       } else {
-        state = state.copyWith(
-          isLoading: false,
-          error: "Failed to fetch todos",
-        );
+        final cachedTodos = ThemeStorageService.instance.getTodos();
+        if (cachedTodos != null) {
+          final List<Data> todos = (jsonDecode(cachedTodos) as List)
+              .map((e) => Data.fromJson(e))
+              .toList();
+          state = state.copyWith(
+            isLoading: false,
+            todos: todos,
+            totalItems: todos.length,
+            totalPages: 1,
+            currentPage: 1,
+          );
+        } else {
+          state = state.copyWith(
+            isLoading: false,
+            error: "Failed to fetch todos",
+          );
+        }
       }
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      final cachedTodos = ThemeStorageService.instance.getTodos();
+      if (cachedTodos != null) {
+        final List<Data> todos = (jsonDecode(cachedTodos) as List)
+            .map((e) => Data.fromJson(e))
+            .toList();
+        state = state.copyWith(
+          isLoading: false,
+          todos: todos,
+          totalItems: todos.length,
+          totalPages: 1,
+          currentPage: 1,
+        );
+      } else {
+        state = state.copyWith(isLoading: false, error: e.toString());
+      }
     }
   }
 
@@ -110,7 +150,6 @@ class TodoNotifier extends StateNotifier<TodoState> {
 
         final rawData = json["data"];
         if (rawData == null || rawData is! Map<String, dynamic>) {
-          // Silently stop loading — don't set an error that bleeds into other screens
           state = state.copyWith(isLoading: false);
           return;
         }
@@ -130,6 +169,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
     required int id,
     required String title,
     required String description,
+    required String deadline,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -137,6 +177,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
         id: id,
         title: title,
         description: description,
+        deadline: deadline,
       );
       if (response.statusCode == 200) {
         await fetchTodos();

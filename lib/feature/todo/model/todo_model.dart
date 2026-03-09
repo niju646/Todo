@@ -17,6 +17,7 @@ class Data {
   int? id;
   String? title;
   String? description;
+  String? deadline;
   DateTime? updatedAt;
   DateTime? createdAt;
 
@@ -25,6 +26,7 @@ class Data {
     this.id,
     this.title,
     this.description,
+    this.deadline,
     this.updatedAt,
     this.createdAt,
   });
@@ -34,6 +36,7 @@ class Data {
     id: json["id"],
     title: json["title"],
     description: json["description"],
+    deadline: json["deadline"],
     updatedAt: json["updatedAt"] == null
         ? null
         : DateTime.parse(json["updatedAt"]),
@@ -47,6 +50,7 @@ class Data {
     "id": id,
     "title": title,
     "description": description,
+    "deadline": deadline,
     "updatedAt": updatedAt?.toIso8601String(),
     "createdAt": createdAt?.toIso8601String(),
   };

@@ -40,10 +40,12 @@ class TodoService {
     required int id,
     required String title,
     required String description,
+    required String deadline,
   }) async {
     final response = await ApiServices.put("${ApiEndpoints.updateTodo}/$id", {
       "title": title,
       "description": description,
+      "deadline": deadline,
     });
     return response;
   }
