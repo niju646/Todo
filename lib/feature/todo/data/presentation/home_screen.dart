@@ -174,6 +174,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       },
                       title: todo.title ?? "",
                       description: todo.description ?? "",
+                      isCompleted: todo.status ?? false,
                       icon: Icons.delete_outline_rounded,
                       onDelete: () {
                         ref

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:to_do/core/api_end_points.dart';
@@ -59,6 +60,8 @@ class TodoNotifier extends StateNotifier<TodoState> {
         page: nextPage,
         limit: pageSize,
       );
+
+      log(response.toString());
 
       if (response.statusCode == 200) {
         final json = response.data;

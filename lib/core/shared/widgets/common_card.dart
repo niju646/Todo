@@ -6,6 +6,7 @@ class CommonCard extends StatelessWidget {
   final IconData? icon;
   final VoidCallback? onDelete;
   final VoidCallback? onTap;
+  final bool isCompleted;
 
   const CommonCard({
     super.key,
@@ -14,6 +15,7 @@ class CommonCard extends StatelessWidget {
     this.icon,
     this.onDelete,
     this.onTap,
+    this.isCompleted = false,
   });
 
   @override
@@ -78,6 +80,9 @@ class CommonCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                           letterSpacing: 0.1,
+                          decoration: isCompleted
+                              ? TextDecoration.lineThrough
+                              : null,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -89,6 +94,9 @@ class CommonCard extends StatelessWidget {
                           fontSize: 13,
                           color: Theme.of(context).textTheme.bodyMedium?.color,
                           height: 1.3,
+                          decoration: isCompleted
+                              ? TextDecoration.lineThrough
+                              : null,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

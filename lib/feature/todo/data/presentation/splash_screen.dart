@@ -137,122 +137,120 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // ── Decorative circles ──────────────────────────
-            Positioned(
-              top: -60,
-              right: -60,
-              child: _DecorCircle(size: 220, color: Colors.white.withAlpha(6)),
-            ),
-            Positioned(
-              top: 60,
-              right: -20,
-              child: _DecorCircle(size: 120, color: Colors.white.withAlpha(8)),
-            ),
-            Positioned(
-              bottom: -80,
-              left: -80,
-              child: _DecorCircle(size: 280, color: Colors.white.withAlpha(6)),
-            ),
-            Positioned(
-              bottom: 80,
-              left: -20,
-              child: _DecorCircle(size: 130, color: Colors.white.withAlpha(8)),
-            ),
-            Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // App icon
-                  ScaleTransition(
-                    scale: _iconScale,
-                    child: FadeTransition(
-                      opacity: _iconFade,
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(60),
-                              blurRadius: 30,
-                              offset: const Offset(0, 12),
-                            ),
-                            BoxShadow(
-                              color: Colors.white.withAlpha(20),
-                              blurRadius: 1,
-                              offset: const Offset(0, -1),
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.checklist_rounded,
-                            size: 52,
-                            color: Color(0xFF1A1A2E),
+      body: Stack(
+        children: [
+          // ── Decorative circles ──────────────────────────
+          Positioned(
+            top: -60,
+            right: -60,
+            child: _DecorCircle(size: 220, color: Colors.white.withAlpha(6)),
+          ),
+          Positioned(
+            top: 60,
+            right: -20,
+            child: _DecorCircle(size: 120, color: Colors.white.withAlpha(8)),
+          ),
+          Positioned(
+            bottom: -80,
+            left: -80,
+            child: _DecorCircle(size: 280, color: Colors.white.withAlpha(6)),
+          ),
+          Positioned(
+            bottom: 80,
+            left: -20,
+            child: _DecorCircle(size: 130, color: Colors.white.withAlpha(8)),
+          ),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // App icon
+                ScaleTransition(
+                  scale: _iconScale,
+                  child: FadeTransition(
+                    opacity: _iconFade,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(28),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(60),
+                            blurRadius: 30,
+                            offset: const Offset(0, 12),
                           ),
+                          BoxShadow(
+                            color: Colors.white.withAlpha(20),
+                            blurRadius: 1,
+                            offset: const Offset(0, -1),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.checklist_rounded,
+                          size: 52,
+                          color: Color(0xFF1A1A2E),
                         ),
                       ),
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: 28),
+                const SizedBox(height: 28),
 
-                  // App name
-                  SlideTransition(
-                    position: _textSlide,
-                    child: FadeTransition(
-                      opacity: _textFade,
-                      child: const Text(
-                        "MyToDo",
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
+                // App name
+                SlideTransition(
+                  position: _textSlide,
+                  child: FadeTransition(
+                    opacity: _textFade,
+                    child: const Text(
+                      "MyToDo",
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-                  // Tagline
-                  SlideTransition(
-                    position: _taglineSlide,
-                    child: FadeTransition(
-                      opacity: _taglineFade,
-                      child: Text(
-                        "Stay organised. Stay ahead.",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withAlpha(160),
-                          letterSpacing: 0.3,
-                        ),
+                // Tagline
+                SlideTransition(
+                  position: _taglineSlide,
+                  child: FadeTransition(
+                    opacity: _taglineFade,
+                    child: Text(
+                      "Stay organised. Stay ahead.",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withAlpha(160),
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
 
-            // ── Loading dots at bottom ───────────────────────
-            Positioned(
-              bottom: 48,
-              left: 0,
-              right: 0,
-              child: FadeTransition(
-                opacity: _dotsFade,
-                child: const _PulsingDots(),
-              ),
+          // ── Loading dots at bottom ───────────────────────
+          Positioned(
+            bottom: 48,
+            left: 0,
+            right: 0,
+            child: FadeTransition(
+              opacity: _dotsFade,
+              child: const _PulsingDots(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
