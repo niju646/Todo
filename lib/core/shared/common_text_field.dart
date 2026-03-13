@@ -37,9 +37,14 @@ class _CommonTextFieldState extends State<CommonTextField> {
     return TextFormField(
       validator: widget.validator,
       controller: widget.controller,
-      maxLines: widget.isLarge ? 5 : 1,
+      maxLines: widget.isLarge ? null : 1,
       obscureText: widget.suffixIcon ? _obscurePassword : widget.obscureText,
-      keyboardType: widget.keyboardType,
+      keyboardType: widget.isLarge
+          ? TextInputType.multiline
+          : widget.keyboardType,
+      textInputAction: widget.isLarge
+          ? TextInputAction.newline
+          : TextInputAction.done,
       decoration: InputDecoration(
         labelText: widget.labelText,
         border: OutlineInputBorder(

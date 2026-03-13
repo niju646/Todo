@@ -35,7 +35,7 @@ class CustomInterceptor extends Interceptor {
 
         final response = await dio.post(
           '${BaseUrls.todos}${ApiEndpoints.refreshToken}',
-          data: {"token": refreshToken},
+          data: {"refreshToken": refreshToken},
         );
 
         final newAccessToken = response.data['accessToken'];

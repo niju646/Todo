@@ -61,6 +61,9 @@ class UserNotifier extends StateNotifier<UserState> {
         await ThemeStorageService.instance.saveUserData(
           jsonEncode(user.toJson()),
         );
+
+        log("AccessToken: ${ThemeStorageService.instance.getAccessToken()}");
+        log("RefreshToken: ${ThemeStorageService.instance.getRefreshToken()}");
         state = state.copyWith(isLoading: false, user: user);
       } else {
         state = state.copyWith(

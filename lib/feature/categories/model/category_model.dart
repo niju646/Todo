@@ -18,6 +18,7 @@ class Data {
   int? userId;
   DateTime? updatedAt;
   DateTime? createdAt;
+  int? categoryId;
 
   Data({this.id, this.name, this.userId, this.updatedAt, this.createdAt});
 
