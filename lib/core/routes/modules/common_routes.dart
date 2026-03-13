@@ -66,9 +66,10 @@ final List<GoRoute> commonRoutes = [
     path: '/createtodo',
     name: RouteConstants.createtodo,
     pageBuilder: (context, state) {
+      final categoryId = state.extra as int;
       return CustomTransitionPage(
         key: state.pageKey,
-        child: CreateTodoScreen(),
+        child: CreateTodoScreen(categoryId: categoryId),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },

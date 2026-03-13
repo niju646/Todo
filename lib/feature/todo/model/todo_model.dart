@@ -20,6 +20,7 @@ class Data {
   String? deadline;
   DateTime? updatedAt;
   DateTime? createdAt;
+  int? categoryId;
 
   Data({
     this.status,
@@ -29,6 +30,7 @@ class Data {
     this.deadline,
     this.updatedAt,
     this.createdAt,
+    this.categoryId,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
@@ -43,6 +45,7 @@ class Data {
     createdAt: json["createdAt"] == null
         ? null
         : DateTime.parse(json["createdAt"]),
+    categoryId: json["category_id"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,6 +56,7 @@ class Data {
     "deadline": deadline,
     "updatedAt": updatedAt?.toIso8601String(),
     "createdAt": createdAt?.toIso8601String(),
+    "category_id": categoryId,
   };
 }
 

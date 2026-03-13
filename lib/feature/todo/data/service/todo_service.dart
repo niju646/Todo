@@ -7,18 +7,26 @@ class TodoService {
   Future<Response> createTodo({
     required String title,
     required String description,
+    required String categoryId,
+    required String deadline,
   }) async {
     final response = await ApiServices.post(ApiEndpoints.getTodo, {
       "title": title,
       "description": description,
+      "category_id": categoryId,
+      "deadline": deadline,
     });
     return response;
   }
 
   //get all todos
-  Future<Response> getTodo({required int page, required int limit}) async {
+  Future<Response> getTodo({
+    required int page,
+    required int limit,
+    required int categoryId,
+  }) async {
     final response = await ApiServices.get(
-      "${ApiEndpoints.getAllTodo}?page=$page&limit=$limit",
+      "${ApiEndpoints.getAllTodo}/$categoryId?page=$page&limit=$limit",
     );
     return response;
   }

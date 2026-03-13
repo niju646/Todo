@@ -85,7 +85,7 @@ class HomeHeaderCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 14, color: Colors.white),
                     cursorColor: Colors.white,
                     decoration: InputDecoration(
-                      hintText: "Search tasks...",
+                      hintText: "Search here...",
                       hintStyle: TextStyle(
                         color: Colors.white.withAlpha(90),
                         fontSize: 14,

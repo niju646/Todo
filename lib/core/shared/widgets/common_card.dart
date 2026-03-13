@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CommonCard extends StatelessWidget {
   final String title;
-  final String description;
+  final String? description;
   final IconData? icon;
   final VoidCallback? onDelete;
   final VoidCallback? onTap;
@@ -11,7 +11,7 @@ class CommonCard extends StatelessWidget {
   const CommonCard({
     super.key,
     required this.title,
-    required this.description,
+    this.description,
     this.icon,
     this.onDelete,
     this.onTap,
@@ -88,19 +88,22 @@ class CommonCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 3),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
-                          height: 1.3,
-                          decoration: isCompleted
-                              ? TextDecoration.lineThrough
-                              : null,
+                      if (description != null)
+                        Text(
+                          description ?? "",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.color,
+                            height: 1.3,
+                            decoration: isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
                     ],
                   ),
                 ),

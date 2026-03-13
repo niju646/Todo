@@ -13,4 +13,9 @@ class ApiEndpoints {
   static const String totalCompletedTodos = "/totalCompletedTodos";
   static const String pendingCount = "/pendingCount";
   static const String refreshToken = "/public/refreshToken";
+
+  //categories
+  static const String createCategory = "/createCategory";
+  static const String getAllCategory = "/getAllCategories";
+  static const String deleteCategory = "/deleteCategory";
 }

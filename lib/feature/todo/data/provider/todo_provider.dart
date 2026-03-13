@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:to_do/core/api_end_points.dart';
-import 'package:to_do/core/services/api_services.dart';
 import 'package:to_do/core/storage/storage_service.dart';
 import 'package:to_do/feature/todo/data/service/todo_service.dart';
 import 'package:to_do/feature/todo/model/todo_model.dart';
@@ -20,19 +18,21 @@ class TodoNotifier extends StateNotifier<TodoState> {
     required String title,
     required String description,
     required String deadline,
+    required String categoryId,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final response = await ApiServices.post(ApiEndpoints.getTodo, {
-        "title": title,
-        "description": description,
-        "deadline": deadline,
-      });
+      final response = await TodoService().createTodo(
+        title: title,
+        description: description,
+        deadline: deadline,
+        categoryId: categoryId,
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final createdTodo = CreateTodo.fromJson(response.data);
-        await fetchTodos();
+        await fetchTodos(categoryId: int.parse(categoryId));
         state = state.copyWith(isLoading: false, createdTodo: createdTodo);
       } else {
         state = state.copyWith(
@@ -46,7 +46,10 @@ class TodoNotifier extends StateNotifier<TodoState> {
   }
 
   /// FETCH TODOS
-  Future<void> fetchTodos({bool loadMore = false}) async {
+  Future<void> fetchTodos({
+    bool loadMore = false,
+    required int categoryId,
+  }) async {
     if (state.isLoading) return;
     if (loadMore && !state.hasMore) return; // nothing more to load
 
@@ -59,6 +62,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
       final response = await TodoService().getTodo(
         page: nextPage,
         limit: pageSize,
+        categoryId: categoryId,
       );
 
       log(response.toString());
@@ -130,7 +134,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
       final response = await TodoService().deleteTodo(id: id);
       if (response.statusCode == 200) {
         // Re-fetch same number of items currently shown (stay on page 1 but keep count)
-        await fetchTodos();
+        // await fetchTodos();
         state = state.copyWith(isLoading: false);
       } else {
         state = state.copyWith(
@@ -183,7 +187,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
         deadline: deadline,
       );
       if (response.statusCode == 200) {
-        await fetchTodos();
+        // await fetchTodos();
         state = state.copyWith(isLoading: false);
       } else {
         state = state.copyWith(
@@ -202,7 +206,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
     try {
       final response = await TodoService().updateStatus(id: id, status: status);
       if (response.statusCode == 200) {
-        await fetchTodos();
+        // await fetchTodos();
         state = state.copyWith(isLoading: false);
       } else {
         state = state.copyWith(
@@ -217,7 +221,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
 
   /// REFRESH
   Future<void> refresh() async {
-    await fetchTodos();
+    // await fetchTodos();
   }
 
   //total todo

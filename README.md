@@ -23,6 +23,10 @@ A Flutter Todo app demonstrating:
 - Notifications toggle
 - Safe retry mechanism for expired tokens
 - Analytics screen 
+- Categories screen
+- Each category has its own screen
+- Each category has its own bottomsheet for creating tasks
+- Each task has its own bottomsheet for editing
 
 ---
 

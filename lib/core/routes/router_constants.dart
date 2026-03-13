@@ -7,4 +7,7 @@ class RouteConstants {
   static const String splashScreen = '/splashScreen';
   static const String signup = '/signup';
   static const String login = '/login';
+
+  //category
+  static const String categoryDetails = "/categoryDetails";
 }

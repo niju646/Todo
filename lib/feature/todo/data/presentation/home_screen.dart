@@ -8,7 +8,8 @@ import 'package:to_do/core/shared/common_shimmer_tile.dart';
 import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/shared/widgets/common_card.dart';
 import 'package:to_do/core/shared/widgets/empty_screen.dart';
-import 'package:to_do/feature/todo/data/provider/todo_provider.dart';
+import 'package:to_do/feature/categories/data/presentation/create_category_bottomsheet.dart';
+import 'package:to_do/feature/categories/data/provider/category_provider.dart';
 import 'package:to_do/feature/todo/widgets/home_header_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -33,7 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _scrollController.addListener(() {
       final pos = _scrollController.position;
       if (pos.pixels >= pos.maxScrollExtent - 200) {
-        ref.read(todoProvider.notifier).fetchTodos(loadMore: true);
+        ref.read(categoryProvider.notifier).fetchCategories(loadMore: true);
       }
     });
   }
@@ -46,7 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> refreshAllData() async {
-    await ref.read(todoProvider.notifier).fetchTodos();
+    await ref.read(categoryProvider.notifier).fetchCategories();
   }
 
   @override
@@ -70,19 +71,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
       });
     });
-    final state = ref.watch(todoProvider);
+    final state = ref.watch(categoryProvider);
 
-    final filteredTodos = _searchQuery.isEmpty
-        ? state.todos
-        : state.todos
+    final filteredCategories = _searchQuery.isEmpty
+        ? state.category
+        : state.category
               .where(
-                (t) =>
-                    (t.title ?? '').toLowerCase().contains(
-                      _searchQuery.toLowerCase(),
-                    ) ||
-                    (t.description ?? '').toLowerCase().contains(
-                      _searchQuery.toLowerCase(),
-                    ),
+                (t) => (t.name ?? '').toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
               )
               .toList();
 
@@ -100,14 +97,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             }),
           ),
 
-          if (state.isLoading && state.todos.isEmpty)
+          if (state.isLoading && state.category.isEmpty)
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Center(child: commonShimmerList(itemCount: 10)),
               ),
             )
-          else if (filteredTodos.isEmpty)
+          else if (filteredCategories.isEmpty)
             Expanded(
               child: Center(
                 child: Padding(
@@ -115,14 +112,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: EmptyStateCard(
                     title: _searchQuery.isNotEmpty
                         ? 'No results for "$_searchQuery"'
-                        : "No Todos Found",
+                        : "No Category Found",
                     subtitle: _searchQuery.isNotEmpty
                         ? "Try a different keyword."
-                        : "Start adding your todos now!",
+                        : "Start adding your categories now!",
                     icon: _searchQuery.isNotEmpty
                         ? Icons.search_off_rounded
                         : Icons.checklist_rounded,
-                    actionLabel: _searchQuery.isNotEmpty ? null : "Add Todo",
+                    actionLabel: _searchQuery.isNotEmpty
+                        ? null
+                        : "Add Category",
                     onAction: null,
                   ),
                 ),
@@ -137,10 +136,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                  itemCount: filteredTodos.length + 1,
+                  itemCount: filteredCategories.length + 1,
                   itemBuilder: (context, index) {
                     // Footer
-                    if (index == filteredTodos.length) {
+                    if (index == filteredCategories.length) {
                       if (state.isLoading) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
@@ -152,7 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Center(
                             child: Text(
-                              "All ${state.totalItems} tasks loaded",
+                              "All ${state.totalItems} Categories loaded",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade400,
@@ -164,22 +163,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return const SizedBox.shrink();
                     }
 
-                    final todo = filteredTodos[index];
+                    final category = filteredCategories[index];
                     return CommonCard(
                       onTap: () {
                         context.pushNamed(
-                          RouteConstants.todoDetailScreen,
-                          extra: todo.id,
+                          RouteConstants.categoryDetails,
+                          extra: category,
                         );
                       },
-                      title: todo.title ?? "",
-                      description: todo.description ?? "",
-                      isCompleted: todo.status ?? false,
+                      title: category.name ?? "",
                       icon: Icons.delete_outline_rounded,
                       onDelete: () {
                         ref
-                            .read(todoProvider.notifier)
-                            .deleteTodo(id: todo.id ?? 0);
+                            .read(categoryProvider.notifier)
+                            .deleteCategory(id: category.id ?? 0);
                         CustomSnackbar.show(
                           context,
                           message: "Todo deleted successfully!",
@@ -196,7 +193,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         onPressed: () {
-          context.pushNamed(RouteConstants.createtodo);
+          showCategoryBottomSheet(
+            context: context,
+            title: "category",
+            onPressed: () {},
+          );
         },
         shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white),

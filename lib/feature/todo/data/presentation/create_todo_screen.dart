@@ -9,7 +9,8 @@ import 'package:to_do/core/utils/custom_datepicker.dart';
 import 'package:to_do/feature/todo/data/provider/todo_provider.dart';
 
 class CreateTodoScreen extends ConsumerStatefulWidget {
-  const CreateTodoScreen({super.key});
+  final int categoryId;
+  const CreateTodoScreen({super.key, required this.categoryId});
 
   @override
   ConsumerState<CreateTodoScreen> createState() => _CreateTodoScreenState();
@@ -43,6 +44,7 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
           title: _titleController.text.trim(),
           description: _descriptionController.text.trim(),
           deadline: _dateController.text.trim(),
+          categoryId: widget.categoryId.toString(),
         );
 
     if (!mounted) return;
@@ -66,7 +68,7 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
         children: [
           SizedBox(height: 30),
           // App bar
-          CommonAppBar(title: "Create ToDo"),
+          CommonAppBar(title: "Create ToDo", actions: []),
 
           // Scrollable form content
           Expanded(

@@ -13,6 +13,7 @@ class ThemeStorageService {
 
   //offline todo
   static const _todoCacheKey = 'cached_todos';
+  static const _categoryCacheKey = 'cached_categories';
 
   Box get _box => Hive.box(_boxName);
 
@@ -74,6 +75,21 @@ class ThemeStorageService {
 
   /// Clear todos
   Future<void> clearTodos() async {
+    await _box.delete(_todoCacheKey);
+  }
+
+  //save categories
+  Future<void> saveCategories(String categoriesJson) async {
+    await _box.put(_categoryCacheKey, categoriesJson);
+  }
+
+  /// Get cached todos
+  String? getCategories() {
+    return _box.get(_categoryCacheKey);
+  }
+
+  /// Clear todos
+  Future<void> clearCategories() async {
     await _box.delete(_todoCacheKey);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:to_do/core/routes/router_constants.dart';
 import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/utils/format_date.dart';
 import 'package:to_do/core/utils/helper/helper.dart';
@@ -114,7 +115,10 @@ class _TodoDetailScreenState extends ConsumerState<TodoDetailScreen>
                                             message: "Updated successfully",
                                             type: SnackbarType.success,
                                           );
-                                          context.pop();
+                                          context.pushNamed(
+                                            RouteConstants.categoryDetails,
+                                            extra: todo.categoryId,
+                                          );
                                         },
                                   );
                                 },
