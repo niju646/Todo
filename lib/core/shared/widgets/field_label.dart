@@ -10,14 +10,18 @@ class FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 15, color: const Color(0xFF1A1A2E)),
+        Icon(
+          icon,
+          size: 15,
+          color: Theme.of(context).textTheme.bodyLarge?.color,
+        ),
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1A2E),
+            color: Theme.of(context).textTheme.bodyLarge?.color,
             letterSpacing: 0.1,
           ),
         ),

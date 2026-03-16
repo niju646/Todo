@@ -66,7 +66,7 @@ final List<GoRoute> commonRoutes = [
     path: '/createtodo',
     name: RouteConstants.createtodo,
     pageBuilder: (context, state) {
-      final categoryId = state.extra as int;
+      final categoryId = state.extra as int?;
       return CustomTransitionPage(
         key: state.pageKey,
         child: CreateTodoScreen(categoryId: categoryId),

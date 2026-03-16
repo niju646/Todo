@@ -180,11 +180,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             children: [
                               const TextSpan(text: "Dont have an account? "),
-                              const TextSpan(
+                              TextSpan(
                                 text: "Signup",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF1A1A2E),
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
                                 ),
                               ),
                             ],

@@ -29,7 +29,7 @@ class _CreateCategoryBottomsheetState
           height: 300,
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -67,10 +67,10 @@ class _CreateCategoryBottomsheetState
                       children: [
                         Text(
                           widget.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF1A1A2E),
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                             letterSpacing: 0.2,
                           ),
                         ),

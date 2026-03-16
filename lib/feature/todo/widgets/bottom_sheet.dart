@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/utils/custom_datepicker.dart';
 
 class EditBottomSheet extends StatefulWidget {
@@ -150,6 +152,13 @@ class _EditBottomSheetState extends State<EditBottomSheet> {
                             );
 
                             if (mounted) setState(() => isLoading = false);
+                            if (!context.mounted) return;
+                            context.pop();
+                            CustomSnackbar.show(
+                              context,
+                              message: "updated successfully",
+                              type: SnackbarType.success,
+                            );
                           },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1A1A2E),

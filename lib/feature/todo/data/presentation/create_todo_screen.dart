@@ -6,11 +6,13 @@ import 'package:to_do/core/shared/common_app_bar.dart';
 import 'package:to_do/core/shared/common_text_field.dart';
 import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/utils/custom_datepicker.dart';
+import 'package:to_do/feature/categories/data/provider/category_provider.dart';
+import 'package:to_do/feature/categories/data/widgets/category_drop_down.dart';
 import 'package:to_do/feature/todo/data/provider/todo_provider.dart';
 
 class CreateTodoScreen extends ConsumerStatefulWidget {
-  final int categoryId;
-  const CreateTodoScreen({super.key, required this.categoryId});
+  final int? categoryId;
+  const CreateTodoScreen({super.key, this.categoryId});
 
   @override
   ConsumerState<CreateTodoScreen> createState() => _CreateTodoScreenState();
@@ -21,6 +23,8 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  int? _selectedCategoryId;
+  bool get _showCategoryPicker => widget.categoryId == null;
 
   @override
   void dispose() {
@@ -33,10 +37,24 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
   void initState() {
     super.initState();
     ref.read(todoProvider.notifier);
+    _selectedCategoryId = widget.categoryId;
+    if (_showCategoryPicker) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(categoryProvider.notifier).fetchCategories();
+      });
+    }
   }
 
   Future<void> _handleCreate() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_showCategoryPicker && _selectedCategoryId == null) {
+      CustomSnackbar.show(
+        context,
+        message: "Please select a category",
+        type: SnackbarType.failure,
+      );
+      return;
+    }
 
     await ref
         .read(todoProvider.notifier)
@@ -44,7 +62,8 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
           title: _titleController.text.trim(),
           description: _descriptionController.text.trim(),
           deadline: _dateController.text.trim(),
-          categoryId: widget.categoryId.toString(),
+          // categoryId: widget.categoryId.toString(),
+          categoryId: (_selectedCategoryId ?? widget.categoryId!).toString(),
         );
 
     if (!mounted) return;
@@ -61,6 +80,7 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
   Widget build(BuildContext context) {
     final createTodoState = ref.watch(todoProvider);
     final isLoading = createTodoState.isLoading;
+    final categoryState = ref.watch(categoryProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -118,6 +138,21 @@ class _CreateTodoScreenState extends ConsumerState<CreateTodoScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (_showCategoryPicker) ...[
+                            const _FieldLabel(
+                              label: "Category",
+                              icon: Icons.category_outlined,
+                            ),
+                            const SizedBox(height: 8),
+                            CategoryDropdown(
+                              categories: categoryState.category,
+                              isLoading: categoryState.isLoading,
+                              selectedId: _selectedCategoryId,
+                              onChanged: (id) =>
+                                  setState(() => _selectedCategoryId = id),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
                           _FieldLabel(
                             label: "Title",
                             icon: Icons.title_rounded,

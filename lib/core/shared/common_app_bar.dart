@@ -45,10 +45,10 @@ class CommonAppBar extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1A2E),
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                   letterSpacing: 0.2,
                 ),
                 maxLines: 1,

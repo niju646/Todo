@@ -127,6 +127,84 @@ class TodoNotifier extends StateNotifier<TodoState> {
     }
   }
 
+  //getAllTodosForUser
+  Future<void> getAllTodosForUser({bool loadMore = false}) async {
+    if (state.isLoading) return;
+    if (loadMore && !state.hasMore) return; // nothing more to load
+
+    final nextPage = loadMore ? state.currentPage + 1 : 1;
+    const pageSize = 10;
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final response = await TodoService().getAllTodosForUser(
+        page: nextPage,
+        limit: pageSize,
+      );
+
+      log(response.toString());
+
+      if (response.statusCode == 200) {
+        final json = response.data;
+
+        final List<Data> fetchedTodos = (json["data"] as List)
+            .map((e) => Data.fromJson(e))
+            .toList();
+        //load todo in offline
+        final updatedTodos = loadMore
+            ? [...state.todos, ...fetchedTodos]
+            : fetchedTodos;
+        await ThemeStorageService.instance.saveTodos(
+          jsonEncode(updatedTodos.map((e) => e.toJson()).toList()),
+        );
+
+        state = state.copyWith(
+          isLoading: false,
+          todos: loadMore ? [...state.todos, ...fetchedTodos] : fetchedTodos,
+          totalItems: json["totalItems"],
+          totalPages: json["totalPages"],
+          currentPage: json["currentPage"],
+        );
+      } else {
+        final cachedTodos = ThemeStorageService.instance.getTodos();
+        if (cachedTodos != null) {
+          final List<Data> todos = (jsonDecode(cachedTodos) as List)
+              .map((e) => Data.fromJson(e))
+              .toList();
+          state = state.copyWith(
+            isLoading: false,
+            todos: todos,
+            totalItems: todos.length,
+            totalPages: 1,
+            currentPage: 1,
+          );
+        } else {
+          state = state.copyWith(
+            isLoading: false,
+            error: "Failed to fetch todos",
+          );
+        }
+      }
+    } catch (e) {
+      final cachedTodos = ThemeStorageService.instance.getTodos();
+      if (cachedTodos != null) {
+        final List<Data> todos = (jsonDecode(cachedTodos) as List)
+            .map((e) => Data.fromJson(e))
+            .toList();
+        state = state.copyWith(
+          isLoading: false,
+          todos: todos,
+          totalItems: todos.length,
+          totalPages: 1,
+          currentPage: 1,
+        );
+      } else {
+        state = state.copyWith(isLoading: false, error: e.toString());
+      }
+    }
+  }
+
   //delete todo
   Future<void> deleteTodo({required int id}) async {
     state = state.copyWith(isLoading: true, error: null);

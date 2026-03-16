@@ -2,6 +2,7 @@
 class ApiEndpoints {
   static const String getTodo = "/create";
   static const String getAllTodo = "/getAll";
+  static const String getAllTodosForUser = "/getAllTodosForUser";
   static const String deleteTodo = "/delete";
   static const String updateTodo = "/update";
   static const String getTodoById = "/getById";

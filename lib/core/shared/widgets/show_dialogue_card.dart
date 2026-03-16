@@ -15,7 +15,7 @@ void showDialogueCard({
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -40,7 +40,7 @@ void showDialogueCard({
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1A2E),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 6),
@@ -66,7 +66,7 @@ void showDialogueCard({
                     "Cancel",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                 ),

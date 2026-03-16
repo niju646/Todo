@@ -157,18 +157,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   const TextSpan(text: "I agree to the "),
                                   TextSpan(
                                     text: "Terms of Service",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF1A1A2E),
+                                      color: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge?.color,
                                       decoration: TextDecoration.underline,
                                     ),
                                   ),
                                   const TextSpan(text: " and "),
                                   TextSpan(
                                     text: "Privacy Policy",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF1A1A2E),
+                                      color: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge?.color,
                                       decoration: TextDecoration.underline,
                                     ),
                                   ),
@@ -281,11 +285,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             ),
                             children: [
                               const TextSpan(text: "Already have an account? "),
-                              const TextSpan(
+                              TextSpan(
                                 text: "Log In",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF1A1A2E),
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
                                 ),
                               ),
                             ],

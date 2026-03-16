@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:to_do/core/api_end_points.dart';
 import 'package:to_do/core/services/api_services.dart';
@@ -19,6 +21,7 @@ class CategoryService {
     final response = await ApiServices.get(
       "${ApiEndpoints.getAllCategory}?page=$page&limit=$limit",
     );
+    log(response.toString());
     return response;
   }
 

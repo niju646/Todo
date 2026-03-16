@@ -9,16 +9,17 @@ import 'package:to_do/core/shared/common_shimmer_tile.dart';
 import 'package:to_do/core/shared/custom_snackbar.dart';
 import 'package:to_do/core/shared/widgets/common_card.dart';
 import 'package:to_do/core/shared/widgets/empty_screen.dart';
-import 'package:to_do/feature/todo/data/provider/todo_provider.dart';
+import 'package:to_do/feature/categories/data/presentation/create_category_bottomsheet.dart';
+import 'package:to_do/feature/categories/data/provider/category_provider.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+class CategoryListingScreen extends ConsumerStatefulWidget {
+  const CategoryListingScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<CategoryListingScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<CategoryListingScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
@@ -33,7 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _scrollController.addListener(() {
       final pos = _scrollController.position;
       if (pos.pixels >= pos.maxScrollExtent - 200) {
-        ref.read(todoProvider.notifier).getAllTodosForUser(loadMore: true);
+        ref.read(categoryProvider.notifier).fetchCategories(loadMore: true);
       }
     });
   }
@@ -46,7 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> refreshAllData() async {
-    await ref.read(todoProvider.notifier).getAllTodosForUser();
+    await ref.read(categoryProvider.notifier).fetchCategories();
   }
 
   @override
@@ -70,13 +71,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
       });
     });
-    final state = ref.watch(todoProvider);
+    final state = ref.watch(categoryProvider);
 
-    final filteredTodo = _searchQuery.isEmpty
-        ? state.todos
-        : state.todos
+    final filteredCategories = _searchQuery.isEmpty
+        ? state.category
+        : state.category
               .where(
-                (t) => (t.title ?? '').toLowerCase().contains(
+                (t) => (t.name ?? '').toLowerCase().contains(
                   _searchQuery.toLowerCase(),
                 ),
               )
@@ -87,10 +88,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: Column(
         children: [
           AppHeader(
-            subtitle: "Good morning",
-            title: "My Tasks",
-            badgeCount: state.todos.length,
-            badgeLabel: "tasks",
+            subtitle: "Organise",
+            title: "Categories",
+            badgeCount: state.category.length,
+            badgeLabel: "total",
             searchController: _searchController,
             searchQuery: _searchQuery,
             onSearchChanged: (v) => setState(() => _searchQuery = v),
@@ -98,16 +99,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _searchQuery = '';
               _searchController.clear();
             }),
-            searchHint: "Search tasks...",
+            searchHint: "Search categories...",
           ),
-          if (state.isLoading && state.todos.isEmpty)
+          if (state.isLoading && state.category.isEmpty)
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Center(child: commonShimmerList(itemCount: 10)),
               ),
             )
-          else if (filteredTodo.isEmpty)
+          else if (filteredCategories.isEmpty)
             Expanded(
               child: Center(
                 child: Padding(
@@ -115,14 +116,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: EmptyStateCard(
                     title: _searchQuery.isNotEmpty
                         ? 'No results for "$_searchQuery"'
-                        : "No Todo Found",
+                        : "No Category Found",
                     subtitle: _searchQuery.isNotEmpty
                         ? "Try a different keyword."
                         : "Start adding your categories now!",
                     icon: _searchQuery.isNotEmpty
                         ? Icons.search_off_rounded
                         : Icons.checklist_rounded,
-                    actionLabel: _searchQuery.isNotEmpty ? null : "Add Todo",
+                    actionLabel: _searchQuery.isNotEmpty
+                        ? null
+                        : "Add Category",
                     onAction: null,
                   ),
                 ),
@@ -137,10 +140,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                  itemCount: filteredTodo.length + 1,
+                  itemCount: filteredCategories.length + 1,
                   itemBuilder: (context, index) {
                     // Footer
-                    if (index == filteredTodo.length) {
+                    if (index == filteredCategories.length) {
                       if (state.isLoading) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
@@ -152,7 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Center(
                             child: Text(
-                              "All ${state.totalItems} todos loaded",
+                              "All ${state.totalItems} Categories loaded",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade400,
@@ -164,23 +167,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return const SizedBox.shrink();
                     }
 
-                    final todo = filteredTodo[index];
+                    final category = filteredCategories[index];
                     return CommonCard(
                       onTap: () {
                         context.pushNamed(
-                          RouteConstants.todoDetailScreen,
-                          extra: todo.id,
+                          RouteConstants.categoryDetails,
+                          extra: category,
                         );
                       },
-                      title: todo.title ?? "",
+                      title: category.name ?? "",
                       icon: Icons.delete_outline_rounded,
                       onDelete: () {
                         ref
-                            .read(todoProvider.notifier)
-                            .deleteTodo(id: todo.id ?? 0);
+                            .read(categoryProvider.notifier)
+                            .deleteCategory(id: category.id ?? 0);
                         CustomSnackbar.show(
                           context,
-                          message: "Todo deleted successfully!",
+                          message: "Category deleted successfully!",
                           type: SnackbarType.success,
                         );
                       },
@@ -194,7 +197,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         onPressed: () {
-          context.pushNamed(RouteConstants.createtodo);
+          showCategoryBottomSheet(
+            context: context,
+            title: "category",
+            onPressed: () {},
+          );
         },
         shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white),

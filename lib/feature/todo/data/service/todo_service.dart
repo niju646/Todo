@@ -19,7 +19,7 @@ class TodoService {
     return response;
   }
 
-  //get all todos
+  //get all todos by category id
   Future<Response> getTodo({
     required int page,
     required int limit,
@@ -27,6 +27,17 @@ class TodoService {
   }) async {
     final response = await ApiServices.get(
       "${ApiEndpoints.getAllTodo}/$categoryId?page=$page&limit=$limit",
+    );
+    return response;
+  }
+
+  //getAllTodosForUser
+  Future<Response> getAllTodosForUser({
+    required int page,
+    required int limit,
+  }) async {
+    final response = await ApiServices.get(
+      "${ApiEndpoints.getAllTodosForUser}/?page=$page&limit=$limit",
     );
     return response;
   }
